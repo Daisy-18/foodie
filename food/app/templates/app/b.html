@@ -1,0 +1,271 @@
+<header class="header" data-header>
+    <div class="container d-flex justify-content-between align-items-center">
+
+        <h1 class="mb-0">
+            <a href="#" class="logo">Foodie<span class="span">.</span></a>
+        </h1>
+
+      <nav class="navbar navbar-expand-lg text-white">
+        <div class="container-fluid">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button> 
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    {% comment %} {% if request.user.is_authenticated %} {% endcomment %}
+                    <li class="nav-item">
+                        <a class="navbar-link  active" style="font-weight:bold" aria-current="page" href="{% url 'home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="navbar-link" style="font-weight:bold" href="{% url 'shop' %}">Menu</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="navbar-link "style="font-weight:bold" href="{% url 'blog' %}">Blogs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="navbar-link "style="font-weight:bold" href="{% url 'about' %}">About us</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="navbar-link "style="font-weight:bold" href="{% url 'contact' %}">Contact us</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search" action="/search">
+                  <input class="form-control me-1" type="search" placeholder="Search" name="search" aria-label="Search">
+                  <button type="submit">
+                        <img src="{% static 'icons/search.png' %}" width="30" height="35" />
+                    </button>
+                </form>
+            </div>
+            <ul class="navbar-nav me-auto mb-2 mt-3 mb-lg-0">
+              <li class="nav-item dropdown mx-2">
+                <a class="navbar-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="display: flex; align-items: center;">
+                  <img src="{% static 'icons/profile.png' %}" width="29" height="29" style="margin-right: 5px;" />
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                  <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                  <li><a class="dropdown-item" href="{% url 'passwordchange' %}">Change Password</a></li>
+                  <li><a class="dropdown-item" href="#">Cart</a></li>
+                  <li><a class="dropdown-item" href="#">Wishlist</a></li>
+                  <li><a class="dropdown-item" href="#">My Orders</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><a class="dropdown-item" href="#">Logout</a></li>
+                </ul>
+              </li>
+                <li class="nav-item mx-2">
+                    <a href="{% url 'reservation' %}" class="navbar-link">
+                        <button class="btn btn-hover">Reservation</button>
+                    </a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a href="{% url 'customerregistration' %}" class="navbar-link" style="font-weight:bold; color: white;">Register</a>
+                </li>
+                <li class="nav-item mx-1">
+                    <a href="{% url 'login' %}" class="navbar-link" style="font-weight:bold; color: white;">Login</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    
+      
+    </div>
+</header>
+
+
+
+
+
+class reservation_view(View):
+    def get(self,request):
+        form = ReservationForm()
+        return render(request, 'app/reservation_form.html',locals())
+    def post(self,request):
+        form = ReservationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request,"Congratulations! Table Booked Successfully")
+        else:
+            messages.warning(request,"Inavalid Input Data")
+        return redirect("/success")
+
+
+
+        @login_required
+        def manage_reservation(request):
+        if request.user.is_authenticated:
+            reservations = Reservation.objects.filter(user=request.user)
+        else:
+            reservations = Reservation.objects.none()  # Or handle unauthenticated users appropriately
+    
+        return render(request, 'app/managereservation.html', {'reservations': reservations})
+
+
+
+
+        <header class="header" data-header>
+            <div class="container d-flex justify-content-between align-items-center">
+        
+              <h1 class="mb-0">
+                <a href="#" class="logo">Foodie<span class="span">.</span></a>
+              </h1>
+        
+              <nav class="navbar navbar-expand-lg text-white">
+                <div class="container-fluid">
+                  <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02"
+                    aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                  </button>
+                  <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                    {% if request.user.is_authenticated %}
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                     <li class="nav-item">
+                        <a class="navbar-link  active" style="font-weight:bold" aria-current="page"
+                          href="{% url 'home' %}">Home</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="navbar-link" style="font-weight:bold" href="{% url 'shop' %}">Menu</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="navbar-link " style="font-weight:bold" href="{% url 'blog' %}">Blogs</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="navbar-link " style="font-weight:bold" href="{% url 'about' %}">About us</a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="navbar-link " style="font-weight:bold" href="{% url 'contact' %}">Contact us</a>
+                      </li>
+                    </ul>
+                    <form class="d-flex" role="search" action="/search">
+                      <input class="form-control me-1" type="search" placeholder="Search" name="search" aria-label="Search">
+                      <button type="submit">
+                        <img src="{% static 'icons/search.png' %}" width="30" height="35" />
+                      </button>
+                    </form>
+                  </div>
+                  <ul class="navbar-nav me-auto mb-2 mt-3 mb-lg-0">
+                    <li class="nav-item dropdown mx-2">
+                      <a class="navbar-link dropdown-toggle" href="#" id="profileDropdown" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false" style="display: flex; align-items: center;">
+                        <img src="{% static 'icons/profile.png' %}" width="29" height="29" style="margin-right: 5px;" />
+                      </a>
+                      <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                        <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                        <li><a class="dropdown-item" href="{% url 'passwordchange' %}">Change Password</a></li>
+                        <li><a class="dropdown-item" href="{% url 'manage_reservation' %}">Manage Reservations</a></li>
+                        <li><a class="dropdown-item" href="#">Cart</a></li>
+                        <li><a class="dropdown-item" href="#">Wishlist</a></li>
+                        <li><a class="dropdown-item" href="#">My Orders</a></li>
+                        <li>
+                          <hr class="dropdown-divider">
+                        </li>
+                        <li>
+                          <form method="POST" action="{% url 'logout' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item">Logout</button>
+                          </form>
+                        </li>
+                      </ul>
+                    </li>
+                    <li class="nav-item mx-2">
+                      <a href="{% url 'reservation' %}" class="navbar-link">
+                        <button class="btn btn-hover">Reservation</button>
+                      </a>
+                    </li>
+                  {% else %}
+                    <li class="nav-item mx-1">
+                      <a href="{% url 'customerregistration' %}" class="navbar-link"
+                        style="font-weight:bold; color: white;">Register</a>
+                    </li>
+                    <li class="nav-item mx-1">
+                      <a href="{% url 'login' %}" class="navbar-link" style="font-weight:bold; color: white;">Login</a>
+                    </li>
+                  </ul>
+                  {% endif %}
+                  
+                </div>
+              </nav>
+        
+        
+            </div>
+          </header>
+        
+
+
+
+          {% block main-content %}
+          <div class="container" style="background-image: url('/static/app/images/hero-bg.jpg'); color: white;">
+            {% if messages %} 
+            {% for msg in messages %}
+            <div class="alert alert-danger" role="alert">{{ msg }}</div>
+            {% endfor %} 
+            {% endif %}
+            
+            <div class="row mt-5">
+              <div class="col-sm-6">
+                <h4>Order Summary</h4>
+                <hr>
+                {% for item in cart_items %}
+                <div class="card mb-2" style="background-color: rgba(0, 0, 0, 0.7);">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-lg-4">
+                        <img src="{{ item.product.Image }}" alt="{{ item.product.food_name }}" class="image" style="width: 200px; height: 150px;">
+                      </div>
+                      <div class="col-lg-8" style="text-align: right;">
+                        <h5 style="text-transform: capitalize;">Product: {{ item.product.food_name }}</h5>
+                        <p>Price: {{ item.product.price }}</p>
+                        <p>Quantity: {{ item.quantity }}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+                <p class="fw-bold">Total Cost = {{ totalamount }}</p>
+                
+                <small>Terms and Conditions:</small><br>
+                <small>1. We accept payments securely through Razorpay, and your financial information is not stored by us.</small><br>
+                <small>2. Shipping times may vary by location. You will receive a tracking number for your order.</small><br>
+                <small>3. Your personal information is handled as described in our Privacy Policy.</small><br>
+                <small><b>By proceeding with your order, you acknowledge that you have read, understood, and agreed to these terms and conditions.</b></small><br>
+                <small></small><br>
+                <small></small><br>
+              </div>
+              
+              <div class="col-sm-4 offset-sm-1">
+                <h4>Select Shipping Address</h4>
+                <hr>
+                <form method="post" id="myform">
+                  {% csrf_token %} 
+                  {% for ad in add %}
+                  <div class="card mb-3" style="background-color: rgba(0, 0, 0, 0.7);">
+                    <div class="card-body">
+                      <h5>{{ ad.name }}</h5>
+                      <p>Mobile: {{ ad.mobile }}</p>
+                      <p>{{ ad.locality }} {{ ad.city }} {{ ad.state }} {{ ad.pincode }}</p>
+                    </div>
+                  </div>
+                  <div class="form-check mt-2 mb-5">
+                    <input class="form-check-input" type="radio" name="custid" id="custadd{{ forloop.counter }}" value="{{ ad.id }}">
+                    <label class="form-check-label fw-bold" for="custadd{{ forloop.counter }}">Address: {{ forloop.counter }}</label>
+                  </div>
+                  <div class="form-check mt-2 mb-5">
+                    <input class="form-check-input" type="radio" name="custid" id="pickup{{ forloop.counter }}" value="{{ ad.id }}">
+                    <label class="form-check-label fw-bold" for="pickup{{ forloop.counter }}">Pickup</label>
+                  </div>
+                  {% endfor %}
+                  
+                  <div class="form-check mb-3">
+                    <label for="totalamount" class="form-label">Total Amount</label>
+                    <input type="number" class="form-control" name="totalamount" value="{{ totalamount }}" readonly />
+                  </div>
+                  
+                  <div class="text-end">
+                   <button type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Continue</button>
+                    <!--<div id ="paypal-button-container"></div>-->
+                    <!-- <button id="rzp-button1" type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Payment</button> -->
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <br><br>
+          {% endblock main-content %}

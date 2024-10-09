@@ -1,0 +1,76 @@
+<header class="header" data-header>
+    <div class="container d-flex justify-content-between align-items-center">
+
+        <h1 class="mb-0">
+            <a href="#" class="logo">Foodie<span class="span">.</span></a>
+        </h1>
+
+        <nav class="navbar navbar-expand-lg text-white">
+          <div class="container-fluid">
+              <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+              </button>
+              <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                  <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                      <li class="nav-item">
+                          <a class="navbar-link active" style="font-weight:bold; color: white;" aria-current="page" href="{% url 'home' %}">Home</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="navbar-link" style="font-weight:bold; color: white;" href="{% url 'shop' %}">Menu</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="navbar-link" style="font-weight:bold; color: white;" href="{% url 'blog' %}">Blogs</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="navbar-link" style="font-weight:bold; color: white;" href="{% url 'about' %}">About us</a>
+                      </li>
+                      <li class="nav-item">
+                          <a class="navbar-link" style="font-weight:bold; color: white;" href="{% url 'contact' %}">Contact us</a>
+                      </li>
+                      <form class="d-flex" role="search" action="/search">
+                        <input class="form-control me-1" type="search" placeholder="Search" name="search" aria-label="Search">
+                        <button type="submit">
+                              <img src="{% static 'icons/search.png' %}" width="30" height="35" />
+                          </button>
+                      </form>
+                      <li class="nav-item dropdown mx-2">
+                          <a class="navbar-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="display: flex; align-items: center; color: white;">
+                              <img src="{% static 'icons/profile.png' %}" width="29" height="29" style="margin-right: 5px;" />
+                          </a>
+                          <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                              <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
+                              <li><a class="dropdown-item" href="#">Manage Reservations</a></li>
+                              <li><a class="dropdown-item" href="{% url 'passwordchange' %}">Change Password</a></li>
+                              <li><a class="dropdown-item" href="#">My Orders</a></li>
+                              <li><hr class="dropdown-divider"></li>
+                              <li><a class="dropdown-item" href="#">Logout</a></li>
+                          </ul>
+                      </li>
+                      <li class="nav-item mx-2">
+                          <a href="{% url 'reservation' %}" class="navbar-link">
+                              <button class="btn btn-hover">Reservation</button>
+                          </a>
+                      </li>
+                      <li class="nav-item mx-2"></li>
+                        <a href="#" class="navbar-link" style="font-weight:bold; color: white;">Cart</a>
+                    </li>
+                    <li class="nav-item mx-2">
+                      <a href="#" class="navbar-link" style="font-weight:bold; color: white;">Wishlist</a>
+                  </li>
+                      <li class="nav-item mx-2">
+                          <a href="{% url 'customerregistration' %}" class="navbar-link" style="font-weight:bold; color: white;">Register</a>
+                      </li>
+                      <li class="nav-item mx-2">
+                          <a href="{% url 'login' %}" class="navbar-link" style="font-weight:bold; color: white;">Login</a>
+                      </li>
+                      
+                  </ul>
+              </div>
+          </div>
+      </nav>
+      
+      
+      
+      
+    </div>
+</header>
