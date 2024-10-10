@@ -7,6 +7,8 @@ from .views import feedback, reservation_view, success_view, ManageReservationVi
 from django.contrib.auth import views as auth_view
 from .forms import LoginForm,  MyPasswordResetForm, MyPasswordChangeForm, MySetPasswordForm
 from .views import create_blog
+from .views import paysuccessView, CancelView, Checkout
+
 
 urlpatterns = [
     path("", views.home),
@@ -33,14 +35,16 @@ urlpatterns = [
          name='manage_reservation'),
     path('delete-reservation/<int:reservation_id>/',
          DeleteReservationView.as_view(), name='delete_reservation'),
-    path('checkout/', views.checkout.as_view(), name="checkout"),
+    path('checkout/', views.Checkout.as_view(), name="checkout"),
     path('paymentdone/', views.payment_done, name="paymentdone"),
 
     path('pluscart/', views.plus_cart),
     path('minuscart/', views.minus_cart, name='minus-cart'),
     path('removecart/', views.remove_cart, name='removecart'),
     path('createblog/', create_blog, name='create_blog'),
-
+    path('paysuccess/', paysuccessView.as_view(), name='paysuccess'),
+    path('cancel/', CancelView.as_view(), name='cancel'),
+    path('create-checkout-session/', Checkout.as_view(), name='create_checkout_session'),
     # login authentication
     path('registration/', views.CustomerRegistrationView.as_view(),
          name="customerregistration"),
