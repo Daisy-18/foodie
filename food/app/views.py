@@ -11,6 +11,8 @@ from . forms import CustomerRegistrationForm, CustomerProfileForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from .models import BlogPost
+import stripe
+from django.conf import settings
 # Create your views here.
 def home(request):
     return render(request,"app/home.html")
@@ -285,56 +287,72 @@ def show_cart(request):
     
     
     return render(request, 'app/addtocart.html', {'cart_items': cart_items, 'total_amount': total_amount})
-@method_decorator(login_required,name='dispatch')
-class checkout(View):
-    def get(self,request):
-        user=request.user
-        add=Customer.objects.filter(user=user)
-        cart_items=Cart.objects.filter(user=user)
-        famount = 0
-        for p in cart_items:
-            value=p.quantity * p.product.price
-            famount = famount + value
-        totalamount = famount 
-#         razoramount = int(totalamount * 100)
-#         client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
-#         data = {"amount" :razoramount, "currency":"INR","receipt":"order_rcptid_12"}
-#         payment_response = client.order.create(data=data)
-#         print(payment_response)
-# #         {'id': 'order_MfrhWc9zmEgv6L', 'entity': 'order', 'amount': 32900, 'amount_paid': 0, 'amount_due': 32900, 'currency': 'INR', 'receipt': 'order_rcptid_12', 'offer_id': None, 'status': 'created', 'attempts': 0, 'notes': [], 'created_at': 1695491366}
-#         order_id = payment_response['id']
-#         order_status = payment_response['status']
-#         if order_status == 'created':
-#             payment = Payment(
-#                 user=user,
-#                 amount=totalamount,
-#                 razorpay_order_id = order_id,
-#                 razorpay_payment_status = order_status
-#             )
-#             payment.save()
-        return render(request, 'app/checkout.html',locals())
 
+
+stripe.api_key = settings.STRIPE_SECRET_KEY  # Set your Stripe secret key
+
+@method_decorator(login_required, name='dispatch')
+class Checkout(View):
+    def get(self, request):
+        user = request.user
+        add = Customer.objects.filter(user=user)
+        cart_items = Cart.objects.filter(user=user)
+
+        # Calculate total amount
+        totalamount = sum(item.quantity * item.product.price for item in cart_items)
+
+        # Create a Stripe Payment Intent
+        payment_intent = stripe.PaymentIntent.create(
+            amount=int(totalamount * 100),  # Amount in cents
+            currency='usd',  # Change to your desired currency
+            payment_method_types=["card"],
+        )
+
+        # Save payment details
+        payment = Payment(
+            user=user,
+            amount=totalamount,
+            stripe_payment_intent_id=payment_intent.id,
+            stripe_payment_status=payment_intent.status,
+            paid=False
+        )
+        payment.save()
+
+        return render(request, 'app/checkout.html', {
+            'add': add,
+            'cart_items': cart_items,
+            'totalamount': totalamount,
+            'client_secret': payment_intent['client_secret'],  # Pass client secret to template
+        })
 @login_required
 def payment_done(request):
-    order_id = request.GET.get('order_id')
-    payment_id =  request.GET.get('payment_id')
-    cust_id = request.GET.get('cust_id')
-    #print("payment_done :oid=",order_id,"pid=",payment_id,"cid=",cust_id)
-    user=request.user
-    #return redirect("orders")
-    customer = Customer.objects.get(id=cust_id)
-    #To update payment status and payment payment id
-    payment = Payment.objects.get(razorpay_order_id=order_id)
-    payment.paid=True
-    payment.razorpay_payment_id = payment_id
+    # Use payment intent ID to find the payment
+    payment_intent_id = request.GET.get('payment_intent')  # Assuming you pass this in the query params
+    user = request.user
+    
+    # Fetch the payment associated with the payment intent
+    payment = Payment.objects.get(stripe_payment_intent_id=payment_intent_id)
+    payment.paid = True
+    payment.stripe_payment_status = 'succeeded'  # Assuming payment was successful
     payment.save()
-    #To save order details
-    cart=Cart.objects.filter(user=user)
-    for c in cart:
-        OrderPlaced(user=user,customer=customer,product=c.product,quantity=c.quantity,payment=payment).save()
-        c.delete()
-    return redirect("orders")
 
+    # Get the customer's selected address
+    cust_id = request.GET.get('cust_id')  # Ensure you pass cust_id in the request
+    customer = Customer.objects.get(id=cust_id)
+
+    # Save order details
+    cart = Cart.objects.filter(user=user)
+    for c in cart:
+        OrderPlaced(
+            user=user,
+            customer=customer,
+            product=c.product,
+            quantity=c.quantity,
+            payment=payment
+        ).save()
+        c.delete()  # Remove items from the cart after successful payment
+
+    return redirect("orders")  # Redirect to orders page
 @login_required
 def orders(request):
     order_placed=OrderPlaced.objects.filter(user=request.user)
@@ -406,7 +424,7 @@ def create_blog(request):
         form = BlogForm(request.POST, request.FILES)  # Handle file upload
         if form.is_valid():
             form.save()  # Save the new blog post
-            return redirect('blog_list')  # Redirect to a page that lists blogs
+            return redirect('blog')  # Redirect to a page that lists blogs
     else:
         form = BlogForm()
     return render(request, 'app/create_blog.html', {'form': form})
@@ -414,3 +432,12 @@ def create_blog(request):
 def blog(request):
     blog_posts = BlogPost.objects.all()  # Get all blog posts
     return render(request, 'app/blog.html', {'blog_posts': blog_posts})
+
+class paysuccessView(View):
+    def get(self, request):
+        return render(request, 'app/paysuccess.html')
+
+class CancelView(View):
+    def get(self, request):
+        return render(request, 'app/cancel.html')
+
