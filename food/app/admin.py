@@ -1,5 +1,5 @@
 from django.contrib import admin
-from . models import Product, Customer, Reservation, Feedback, Cart
+from . models import Product, Customer, Reservation, Feedback, Cart, OrderPlaced, Payment
 from django.urls import reverse
 from django.utils.html import format_html
 # Register your models here.
