@@ -28,4 +28,11 @@ class FeedbackModelAdmin(admin.ModelAdmin):
 class CartAdmin(admin.ModelAdmin):
     def products(self, obj):
         link = reverse("admin:app_product_change", args=[obj.product.id])
-        return format_html('<a href="{}">{}</a>', link, obj.product.food_name)
+        return format_html('<a href="{}">{}</a>', link, obj.product.food_name
+                           
+                           
+@admin.register(Blog)                           
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('name', 'date', 'message')  # Fields to display in the list view
+    search_fields = ('name', 'message')  # Fields to search in admin
+    list_filter = ('date',)  # Filter by date
