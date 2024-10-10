@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -127,3 +127,7 @@ LOGIN_URL = '/login/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Stripe Configuration using environment variables
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', 'pk_test_51Q7gUSP1upzzojsoHoYTPl4cfQY3aGeEjg2yD6UdavuUNeeErJNlOcRxIEisWRQgk6LN9dbLW8LDqLwsQtFZDcfs00NXw77muD')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', 'sk_test_51Q7gUSP1upzzojsozcQFFVv8bOxwxw6c0BjNOvnUDLRVLXAtYWoVn9WkdobcmkueNa94hoKDae8HiIzd1KEdOgIQ00q8lktjo6')
