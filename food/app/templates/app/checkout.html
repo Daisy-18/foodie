@@ -4,7 +4,7 @@
 {% block main-content %}
 
 <section class="section section-divider gray about" id="about" style="background-image: url('/static/app/images/hero-bg.jpg')">
-  <div  style="margin-left: 30px;">
+  <div style="margin-left: 30px;">
     {% if messages %} 
     {% for msg in messages %}
     <div class="alert alert-danger" role="alert">{{ msg }}</div>
@@ -19,29 +19,25 @@
           <div class="card-body">
             <div class="row">
               <div class="col-lg-4">
-                <img src="{{ item.product.Image }}" alt="{{ product.food_name }}" class="image" style="width: 200px; height: 150px;">
+                <img src="{{ item.product.Image }}" alt="{{ item.product.food_name }}" class="image" style="width: 200px; height: 150px;">
               </div>
               <div class="col-lg-8" style="text-align: right;">
-                <h5 style="text-transform: capitalize; ">Product: {{ item.product.food_name }}</h5>
-                <p >Price: {{ item.product.price }}</p>
-                <p >Quantity: {{ item.quantity }}</p>
+                <h5 style="text-transform: capitalize;">Product: {{ item.product.food_name }}</h5>
+                <p>Price: {{ item.product.price }}</p>
+                <p>Quantity: {{ item.quantity }}</p>
               </div>
             </div>
           </div>
         </div>
         {% endfor %}
         <p class="fw-bold" style="color: white;">Total Cost = {{ totalamount }}</p>
-        <small style="color: white;">Terms and Condition:</small><br>
-        <small style="color: white;">1. We accept payments securely through Razorpay, and your financial information is not stored by us.</small><br>
-        <small style="color: white;">2. Shipping times may vary by location. You will receive a tracking number for your order.</small><br>
-        <small style="color: white;">3. Your personal information is handled as described in our Privacy Policy.</small><br>
-        <small style="color: white;"><b>By proceeding with your order, you acknowledge that you have read, understood, and agreed to these terms and conditions.</b></small><br>
+        <small style="color: white;">Terms and Conditions...</small><br>
       </div>
       <div class="col-sm-4 offset-sm-1">
         <h4 style="color: white;">Select Shipping Address</h4>
         <hr />
         <form method="post" id="myform">
-          {% csrf_token %} 
+          {% csrf_token %}
           {% for ad in add %}
           <div class="card">
             <div class="card-body">
@@ -57,17 +53,8 @@
               name="custid"
               id="custadd{{ forloop.counter }}"
               value="{{ ad.id }}">
-            <label class="form-check-label fw-bold" for="custadd{{ forloop.counter }}">Address:{{ forloop.counter }}</label>
+            <label class="form-check-label fw-bold" for="custadd{{ forloop.counter }}">Address: {{ forloop.counter }}</label>
           </div>
-          <!-- <div class="form-check mt-2 mb-5">
-            <input
-              class="form-check-input"
-              type="radio"
-              name="custid"
-              id="custadd{{ forloop.counter }}"
-              value="{{ ad.id }}">
-            <label class="form-check-label fw-bold" for="custadd{{ forloop.counter }}">Pickup</label>
-          </div> -->
           {% endfor %}
           
           <div class="form-check mb-3">
@@ -81,9 +68,8 @@
           </div>
           
           <div class="text-end">
-            <button type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Continue</button>
-            <!--<div id ="paypal-button-container"></div>-->
-            <!-- <button id="rzp-button1" type="submit" class="btn btn-warning mt-3 px-5 fw-bold">Payment</button> -->
+            
+            <button id="stripe-button" type="button" class="btn btn-warning mt-3 px-5 fw-bold">Pay with Stripe</button>
           </div>
         </form>
       </div>
@@ -93,38 +79,39 @@
 </section>
 {% endblock main-content %} 
 
-<!-- {% block payment-gateway %}
+{% block payment-gateway %}
+<script src="https://js.stripe.com/v3/"></script>
 <script>
-var options = {
-    "key": "rzp_test_76e7C2M7OrgHKk", // Enter the Key ID generated from the Dashboard
-    "amount": "{{razoramount}}", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-    "currency": "INR",
-    "name": "Sfit Food Adda",
-    "description": "Purchase Product",
-    //"image": "C:\Users\SANIYA\OneDrive\Desktop\Crystal Sem 5\crystal5\app\static\app\images\homepage\LogoCrystal1.png", 
-    "order_id": "{{order_id}}", //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-    "handler": function (response){
-      console.log("success")
-      var form = document.getElementById("myform");
-        //alert(form.elements["custid"].value);
-        //alert(response.razorpay_payment_id);
-        //alert(response.razorpay_order_id);
-        //alert(response.razorpay_signature)
-        window.location.href = `http://localhost:8000/paymentdone?order_id=${response.razorpay_order_id}&payment_id=${response.razorpay_payment_id}&cust_id=${form.elements["custid"].value}`
-    },
-    "theme": {
-        "color": "#f0ffff"
-    }
-};
-var rzp1 = new Razorpay(options);
-rzp1.on('payment.failed', function (response){
-        alert(response.error.description);
-});
-document.getElementById('rzp-button1').onclick = function(e){
-  console.log("button click");
-    rzp1.open();
-    e.preventDefault();
-}
+  var stripe = Stripe('pk_test_51Q7gUSP1upzzojsoHoYTPl4cfQY3aGeEjg2yD6UdavuUNeeErJNlOcRxIEisWRQgk6LN9dbLW8LDqLwsQtFZDcfs00NXw77muD');  // Replace with your public Stripe key
+  var checkoutButton = document.getElementById('stripe-button');
+
+  checkoutButton.addEventListener('click', function () {
+    fetch('/create-checkout-session/', {  // The endpoint you created in Django
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'  // Include CSRF token
+      },
+      body: JSON.stringify({
+        price_id: '{{ YOUR_PRICE_ID }}',  // Replace with your price ID or pass it dynamically
+        total_amount: '{{ totalamount }}'  // Optional: send total amount
+      })
+    })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (sessionId) {
+      return stripe.redirectToCheckout({ sessionId: sessionId });
+    })
+    .then(function (result) {
+      if (result.error) {
+        alert(result.error.message);
+      }
+    })
+    .catch(function (error) {
+      console.error('Error:', error);
+    });
+  });
 </script>
 
-{% endblock payment-gateway %} -->
+{% endblock payment-gateway %}
